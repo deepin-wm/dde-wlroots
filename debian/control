@@ -1,0 +1,85 @@
+Source: dde-wlroots
+Section: libdevel
+Priority: optional
+Maintainer: rewine <luhongxu@deepin.org>
+Build-Depends: cmake (>= 3.25.0),
+               debhelper-compat (= 13),
+               ninja-build,
+               pkg-config,
+               wayland-protocols,
+               libwayland-dev (>= 1.26.0),
+               libwayland-bin,
+               libdrm-dev (>= 2.4.134),
+               libxkbcommon-dev,
+               libpixman-1-dev (>= 0.46.4),
+               libudev-dev,
+               libseat-dev,
+               libdisplay-info-dev,
+               libliftoff-dev (>= 0.4.0),
+               libinput-dev (>= 1.19.0),
+               libegl-dev,
+               libgbm-dev,
+               libgles-dev,
+               libvulkan-dev,
+               glslang-tools,
+               liblcms2-dev,
+               libxcb1-dev,
+               libxcb-dri3-dev,
+               libxcb-present-dev,
+               libxcb-render0-dev,
+               libxcb-render-util0-dev,
+               libxcb-shm0-dev,
+               libxcb-xfixes0-dev,
+               libxcb-xinput-dev,
+               libxcb-composite0-dev,
+               libxcb-ewmh-dev,
+               libxcb-icccm4-dev,
+               libxcb-res0-dev,
+               libxcb-shape0-dev,
+               libxcb-errors-dev,
+               xwayland,
+               hwdata
+Standards-Version: 4.6.0
+Homepage: https://github.com/linuxdeepin/dde-wlroots
+Rules-Requires-Root: no
+
+Package: dde-wlroots-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Depends: libwayland-dev (>= 1.26.0),
+         libdrm-dev (>= 2.4.134),
+         libxkbcommon-dev,
+         libpixman-1-dev (>= 0.46.4),
+         libudev-dev,
+         libseat-dev,
+         libdisplay-info-dev,
+         libliftoff-dev (>= 0.4.0),
+         libinput-dev (>= 1.19.0),
+         libegl-dev,
+         libgbm-dev,
+         libgles-dev,
+         libvulkan-dev,
+         liblcms2-dev,
+         libxcb1-dev,
+         libxcb-dri3-dev,
+         libxcb-present-dev,
+         libxcb-render0-dev,
+         libxcb-render-util0-dev,
+         libxcb-shm0-dev,
+         libxcb-xfixes0-dev,
+         libxcb-xinput-dev,
+         libxcb-composite0-dev,
+         libxcb-ewmh-dev,
+         libxcb-icccm4-dev,
+         libxcb-res0-dev,
+         libxcb-shape0-dev,
+         libxcb-errors-dev,
+         ${misc:Depends},
+Description: static wlroots for treeland - development files
+ wlroots 0.20.2 built as a static library (libdde-wlroots.a), with the
+ public headers, the wlroots-private protocol XMLs and the dde-wlroots
+ pkg-config metadata that waylib and treeland need at build time.
+ .
+ The archive is linked into the consumers' own shared objects, so no package
+ from this source is needed at runtime.

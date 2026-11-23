@@ -1,0 +1,7 @@
+dde-wlroots (0.20.2-1) unstable; urgency=medium
+
+  * Import wlroots 0.20.2 from the treeland git subtree as its own project.
+  * Build libdde-wlroots.a statically and ship only the development
+    package; nothing here is needed at runtime.
+
+ -- luhongxu <luhongxu@uniontech.com>  Fri, 20 Nov 2026 16:11:37 +0800

@@ -1,2 +1,9 @@
 /subprojects/*
 !/subprojects/*.wrap
+
+/obj-*/
+/debian/.debhelper/
+/debian/dde-wlroots-dev/
+/debian/files
+/debian/*.substvars
+/debian/debhelper-build-stamp

@@ -1,87 +1,70 @@
-# wlroots
+# dde-wlroots
 
-Pluggable, composable, unopinionated modules for building a [Wayland]
-compositor; or about 60,000 lines of code you were going to write anyway.
+A **statically linked** build of [wlroots](https://gitlab.freedesktop.org/wlroots/wlroots)
+0.20.2, packaged for treeland and waylib.
 
-- wlroots provides backends that abstract the underlying display and input
-  hardware, including KMS/DRM, libinput, Wayland, X11, and headless backends,
-  plus any custom backends you choose to write, which can all be created or
-  destroyed at runtime and used in concert with each other.
-- wlroots provides unopinionated, mostly standalone implementations of many
-  Wayland interfaces, both from wayland.xml and various protocol extensions.
-  We also promote the standardization of portable extensions across
-  many compositors.
-- wlroots provides several powerful, standalone, and optional tools that
-  implement components common to many compositors, such as the arrangement of
-  outputs in physical space.
-- wlroots provides an Xwayland abstraction that allows you to have excellent
-  Xwayland support without worrying about writing your own X11 window manager
-  on top of writing your compositor.
-- wlroots provides a renderer abstraction that simple compositors can use to
-  avoid writing GL code directly, but which steps out of the way when your
-  needs demand custom rendering code.
+The history is the real upstream wlroots history: the branch starts at the
+pinned upstream release (see `UPSTREAM`), so `git blame` shows upstream authors,
+and the treeland patches plus the CMake build and Debian packaging that turn it
+into a build-time-only package sit on top as normal commits.
 
-wlroots implements a huge variety of Wayland compositor features and implements
-them *right*, so you can focus on the features that make your compositor
-unique. By using wlroots, you get high performance, excellent hardware
-compatibility, broad support for many wayland interfaces, and comfortable
-development tools - or any subset of these features you like, because all of
-them work independently of one another and freely compose with anything you want
-to implement yourself.
+## Why static
 
-Check out our [wiki] to get started with wlroots. Join our IRC channel:
-[#wlroots on Libera Chat].
+treeland and waylib link the archive into their own shared objects, so
+installing treeland does **not** pull in any library from this project. Only
+`dde-wlroots-dev` is shipped, and only as a build dependency.
 
-A variety of [wrapper libraries] are available for using it with your favorite
-programming language.
+## Build
 
-## Building
+```sh
+cmake -S . -B build -G Ninja -DCMAKE_INSTALL_PREFIX=/usr
+cmake --build build
+DESTDIR=$PWD/debian/tmp cmake --install build
+```
 
-Install dependencies:
+Debian package: `dpkg-buildpackage -b` produces `dde-wlroots-dev`, which
+installs:
 
-* meson
-* wayland
-* wayland-protocols
-* EGL and GLESv2 (optional, for the GLES2 renderer)
-* Vulkan loader, headers and glslang (optional, for the Vulkan renderer)
-* libdrm
-* GBM (optional, for the GBM allocator)
-* libinput (optional, for the libinput backend)
-* xkbcommon
-* udev (optional, for the session)
-* pixman
-* [libseat] (optional, for the session)
-* [hwdata] (optional, for the DRM backend)
-* [libdisplay-info] (optional, for the DRM backend)
-* [libliftoff] (optional, for the DRM backend)
+- `/usr/lib/<multiarch>/libdde-wlroots.a`
+- `/usr/include/wlr/` plus the generated `wlr/config.h`, `wlr/version.h` and the
+  generated protocol headers (both under `/usr/include/wlr/` and flat in
+  `/usr/include/`)
+- `/usr/share/dde-wlroots/protocol/*.xml` — the wlroots-private protocol
+  XMLs consumers generate code from
+- `/usr/lib/<multiarch>/pkgconfig/dde-wlroots.pc`
 
-If you choose to enable X11 support:
+## Consuming it
 
-* xwayland (build-time only, optional at runtime)
-* libxcb
-* libxcb-render-util
-* libxcb-wm
-* libxcb-errors (optional, for improved error reporting)
+```cmake
+pkg_check_modules(WLROOTS REQUIRED IMPORTED_TARGET dde-wlroots)
+```
 
-Run these commands:
+The `.pc` lists every dependency of the archive in `Requires`, so plain
+`--cflags --libs` is already complete for static linking. It also exports the
+metadata used by waylib to regenerate `wconfig.h`:
 
-    meson setup build/
-    ninja -C build/
+| variable | meaning |
+| --- | --- |
+| `wlroots_version`, `wlroots_version_{major,minor,patch}` | upstream version |
+| `wlroots_features` | enabled `WLR_HAVE_*` features, space separated |
+| `wlroots_protocoldir` | directory with the wlroots-private protocol XMLs |
 
-Install like so:
+## Updating from upstream
 
-    sudo ninja -C build/ install
+`UPSTREAM` records the pin. Because the upstream history is the history of this
+repository, an update is a plain merge:
 
-## Contributing
+```sh
+git fetch https://gitlab.freedesktop.org/wlroots/wlroots.git 0.21.0
+git merge FETCH_HEAD
+# then bump WLROOTS_VERSION* in CMakeLists.txt and UPSTREAM
+```
 
-See [CONTRIBUTING.md].
+Review `cmake/WlrootsSources.cmake`, `cmake/WlrootsProtocols.cmake` and
+`cmake/WlrootsShaders.cmake` against the new upstream `meson.build` lists
+afterwards.
 
-[Wayland]: https://wayland.freedesktop.org/
-[wiki]: https://gitlab.freedesktop.org/wlroots/wlroots/-/wikis/Getting-started
-[#wlroots on Libera Chat]: https://web.libera.chat/gamja/?channels=#wlroots
-[wrapper libraries]: https://gitlab.freedesktop.org/wlroots/wlroots/-/wikis/Projects-which-use-wlroots#wrapper-libraries
-[libseat]: https://git.sr.ht/~kennylevinsen/seatd
-[hwdata]: https://github.com/vcrhonek/hwdata
-[libdisplay-info]: https://gitlab.freedesktop.org/emersion/libdisplay-info
-[libliftoff]: https://gitlab.freedesktop.org/emersion/libliftoff
-[CONTRIBUTING.md]: https://gitlab.freedesktop.org/wlroots/wlroots/-/blob/master/CONTRIBUTING.md
+## License
+
+wlroots is MIT (see `LICENSE`). The CMake build and Debian packaging added
+here are Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only.
